@@ -2,42 +2,50 @@ const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
 const axios = require("axios");
 const xml2js = require("xml2js");
 
-const EPG_URL = "https://github.com/limaalef/BrazilTVEPG/raw/master/epg.xml";
+
+const EPG_URL = "https://raw.githubusercontent.com/limaalef/BrazilTVEPG/refs/heads/main/epg.xml";
+
 let epgCache = [];
 
+// 1. Função para buscar o Guia (EPG)
 async function updateEPG() {
     try {
-        console.log("Iniciando download do guia...");
-        const response = await axios.get(EPG_URL, { timeout: 30000 }); // Dá 30 segundos para baixar
+        console.log("Baixando guia EPG...");
+        const response = await axios.get(EPG_URL, { timeout: 15000 });
         const parser = new xml2js.Parser();
         const result = await parser.parseStringPromise(response.data);
         epgCache = result.tv.programme;
-        console.log("✅ Guia de programação atualizado com sucesso!");
+        console.log("✅ Guia atualizado!");
     } catch (err) {
-        console.error("❌ Erro detalhado:", err.message);
-        if (err.code === 'ECONNREFUSED') console.log("Verifique sua conexão com a internet.");
+        console.error("❌ Erro ao carregar EPG:", err.message);
     }
 }
 
+// Atualiza o guia ao iniciar e depois a cada 4 horas
 updateEPG();
 setInterval(updateEPG, 4 * 60 * 60 * 1000);
 
+// 2. Configuração do Manifesto
 const builder = new addonBuilder({
-    id: "org.guia.tvmap",
-    name: "Guia TV Map Brasil",
-    version: "1.0.0", // ESTA LINHA É OBRIGATÓRIA E DEVE SER ASSIM
-    description: "Apenas programação atual dos canais brasileiros.",
+    id: "org.guia.tvmap.br",
+    name: "Guia TV Brasil",
+    version: "1.0.0",
+    description: "Programação atual dos canais brasileiros.",
     resources: ["catalog", "meta"],
     types: ["tv"],
-    catalogs: [{
-        type: "tv",
-        id: "guia_br",
-        name: "Programação Agora"
-    }]
+    catalogs: [
+        {
+            type: "tv",
+            id: "guia_br",
+            name: "Programação Agora"
+        }
+    ]
 });
 
-builder.defineCatalogHandler(async () => {
-    const agora = new Date();
+// 3. Handler do Catálogo (Lista de Canais)
+builder.defineCatalogHandler(async (args) => {
+    if (args.id === "guia_br") {
+        const agora = new Date();
 
     const canaisParaMostrar = []
 
@@ -81,33 +89,48 @@ builder.defineCatalogHandler(async () => {
       { xmlId: "Premiere2", name: "Premiere 2", logo: "https://i.imgur.com/mOnd1H9.png" }
   ];
 
-    const metas = canaisParaMostrar.map(canal => {
-        const prog = epgCache.find(p => {
-            if (p.$.channel !== canal.xmlId) return false;
-            // Converte formato XMLTV (YYYYMMDDHHMMSS) para Date JS
-            const start = new Date(p.$.start.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
-            const stop = new Date(p.$.stop.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
-            return agora >= start && agora <= stop;
+    const metas = canais.map(canal => {
+            let programaAtual = "Clique para ver a programação";
+            
+            // Tenta encontrar o programa no EPG
+            if (epgCache.length > 0) {
+                const prog = epgCache.find(p => {
+                    if (p.$.channel !== canal.id) return false;
+                    const start = new Date(p.$.start.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
+                    const stop = new Date(p.$.stop.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
+                    return agora >= start && agora <= stop;
+                });
+                if (prog) programaAtual = prog.title[0];
+            }
+
+            return {
+                id: `br_${canal.id.toLowerCase()}`,
+                type: "tv",
+                name: canal.name,
+                poster: canal.logo,
+                posterShape: "square",
+                description: `Agora: ${programaAtual}`
+            };
         });
 
-        const infoAtualmente = prog ? prog.title[0] : "Sem guia disponível";
-
-        return {
-            id: `guia_${canal.xmlId.toLowerCase()}`,
-            type: "tv",
-            name: `${canal.name} - 📅 ${infoAtualmente}`,
-            poster: canal.logo,
-            description: prog ? `Resumo: ${prog.desc ? prog.desc[0] : 'Sem descrição.'}` : ""
-        };
-    });
-
-    return { metas };
+        return { metas };
+    }
+    return { metas: [] };
 });
 
-// Handler de Meta (para quando o usuário clicar no canal ver detalhes)
-builder.defineMetaHandler(({ id }) => {
-    // Retorna detalhes extras se necessário
-    return Promise.resolve({ meta: { id, type: "tv" } });
+// 4. Handler de Metadados (Quando clica no canal)
+builder.defineMetaHandler(async (args) => {
+    // Retorna os detalhes do canal se necessário
+    return { meta: null };
 });
 
-serveHTTP(builder.getInterface(), { port: process.env.PORT || 7000 });
+// 5. Exportação para Vercel/Render
+const addonInterface = builder.getInterface();
+module.exports = (req, res) => {
+    addonInterface.serveHTTP(req, res);
+};
+
+// Rodar localmente (node index.js)
+if (require.main === module) {
+    serveHTTP(addonInterface, { port: process.env.PORT || 7000 });
+}
