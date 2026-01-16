@@ -1,136 +1,174 @@
-const { addonBuilder, serveHTTP } = require("stremio-addon-sdk");
-const axios = require("axios");
-const xml2js = require("xml2js");
-
-
-const EPG_URL = "https://raw.githubusercontent.com/limaalef/BrazilTVEPG/refs/heads/main/epg.xml";
+// URL do Guia (EPG)
+const EPG_URL = "https://raw.githubusercontent.com/LITUATUI/TV-MAP/main/guia.xml";
 
 let epgCache = [];
 
-// 1. Função para buscar o Guia (EPG)
+// Função para buscar o Guia (EPG)
 async function updateEPG() {
     try {
         console.log("Baixando guia EPG...");
-        const response = await axios.get(EPG_URL, { timeout: 15000 });
+        const response = await axios.get(EPG_URL, { timeout: 20000 });
         const parser = new xml2js.Parser();
         const result = await parser.parseStringPromise(response.data);
-        epgCache = result.tv.programme;
-        console.log("✅ Guia atualizado!");
+        if (result && result.tv && result.tv.programme) {
+            epgCache = result.tv.programme;
+            console.log("✅ Guia EPG carregado com " + epgCache.length + " entradas.");
+        }
     } catch (err) {
         console.error("❌ Erro ao carregar EPG:", err.message);
     }
 }
 
-// Atualiza o guia ao iniciar e depois a cada 4 horas
+// Inicia a carga do EPG
 updateEPG();
 setInterval(updateEPG, 4 * 60 * 60 * 1000);
 
-// 2. Configuração do Manifesto
 const builder = new addonBuilder({
-    id: "org.guia.tvmap.br",
+    id: "org.guia.tvmap.br.v2",
     name: "Guia TV Brasil",
-    version: "1.0.0",
-    description: "Programação atual dos canais brasileiros.",
+    version: "1.0.5",
+    description: "Canais Brasileiros - Programação em Tempo Real",
     resources: ["catalog", "meta"],
     types: ["tv"],
     catalogs: [
         {
             type: "tv",
             id: "guia_br",
-            name: "Programação Agora"
+            name: "Programação Agora",
+            extra: [{ name: "search", isRequired: false }]
         }
     ]
 });
 
-// 3. Handler do Catálogo (Lista de Canais)
-builder.defineCatalogHandler(async (args) => {
+ const CANAIS_FIXOS = [
+     const CANAIS_FIXOS = [
+    // ABERTOS
+    { id: "Globo", name: "Globo", logo: "https://i.imgur.com/7S879vS.png" },
+    { id: "SBT", name: "SBT", logo: "https://i.imgur.com/vHqQ9z4.png" },
+    { id: "Record", name: "Record TV", logo: "https://i.imgur.com/uG939z4.png" },
+    { id: "Band", name: "Band", logo: "https://i.imgur.com/O6S322P.png" },
+    { id: "RedeTV", name: "Rede TV!", logo: "https://i.imgur.com/S6pC0zI.png" },
+    { id: "Cultura", name: "TV Cultura", logo: "https://i.imgur.com/p00P3p8.png" },
+    { id: "Gazeta", name: "TV Gazeta", logo: "https://i.imgur.com/fMv72K6.png" },
+
+    // FILMES E SÉRIES
+    { id: "HBO", name: "HBO", logo: "https://i.imgur.com/H6D4F9T.png" },
+    { id: "HBO2", name: "HBO 2", logo: "https://i.imgur.com/Y3UuA6O.png" },
+    { id: "HBOFamily", name: "HBO Family", logo: "https://i.imgur.com/8f8Z0eB.png" },
+    { id: "HBOSignature", name: "HBO Signature", logo: "https://i.imgur.com/w9Z8bW9.png" },
+    { id: "HBO Mundi", name: "HBO Mundi", logo: "https://i.imgur.com/UfK8W6y.png" },
+    { id: "HBO Pop", name: "HBO Pop", logo: "https://i.imgur.com/N7WzVvT.png" },
+    { id: "HBO Xtreme", name: "HBO Xtreme", logo: "https://i.imgur.com/6U8Y1O6.png" },
+    { id: "Warner", name: "Warner TV", logo: "https://i.imgur.com/yF9x8Vn.png" },
+    { id: "TNT", name: "TNT", logo: "https://i.imgur.com/z8tFw8F.png" },
+    { id: "TNTSeries", name: "TNT Series", logo: "https://i.imgur.com/E5vA7Lh.png" },
+    { id: "Space", name: "Space", logo: "https://i.imgur.com/z0S8u8I.png" },
+    { id: "AXN", name: "AXN", logo: "https://i.imgur.com/w09BvYn.png" },
+    { id: "Universal", name: "Universal TV", logo: "https://i.imgur.com/H8iN2y0.png" },
+    { id: "USA", name: "USA Network", logo: "https://i.imgur.com/Vp6q8z4.png" },
+    { id: "Paramount", name: "Paramount Network", logo: "https://i.imgur.com/U3qW2Yn.png" },
+    { id: "Megapix", name: "Megapix", logo: "https://i.imgur.com/H7yW8Zf.png" },
+    { id: "CanalBrasil", name: "Canal Brasil", logo: "https://i.imgur.com/H9z9fX8.png" },
+    { id: "StudioUniversal", name: "Studio Universal", logo: "https://i.imgur.com/v8S9bWn.png" },
+    
+    // INFANTIL
+    { id: "Cartoon", name: "Cartoon Network", logo: "https://i.imgur.com/I7V8vYn.png" },
+    { id: "DiscoveryKids", name: "Discovery Kids", logo: "https://i.imgur.com/G9b8fXn.png" },
+    { id: "Gloob", name: "Gloob", logo: "https://i.imgur.com/U7v8YZn.png" },
+    { id: "Nick", name: "Nickelodeon", logo: "https://i.imgur.com/Z9v8fXn.png" },
+    
+    // DOCUMENTÁRIOS E VARIEDADES
+    { id: "Discovery", name: "Discovery Channel", logo: "https://i.imgur.com/v7S9bXn.png" },
+    { id: "DiscHomeHealth", name: "Discovery H&H", logo: "https://i.imgur.com/U8v8fXn.png" },
+    { id: "NationalGeographic", name: "Nat Geo", logo: "https://i.imgur.com/Z9v8fXo.png" },
+    { id: "History", name: "History", logo: "https://i.imgur.com/V9b8fXp.png" },
+    { id: "GNT", name: "GNT", logo: "https://i.imgur.com/I9v8fXq.png" },
+    { id: "Multishow", name: "Multishow", logo: "https://i.imgur.com/H9v8fXr.png" },
+    { id: "Viva", name: "Viva", logo: "https://i.imgur.com/G9v8fXs.png" },
+    
+    // ESPORTES
+    { id: "SporTV", name: "SporTV", logo: "https://i.imgur.com/Y9v8fXt.png" },
+    { id: "SporTV2", name: "SporTV 2", logo: "https://i.imgur.com/X9v8fXu.png" },
+    { id: "SporTV3", name: "SporTV 3", logo: "https://i.imgur.com/W9v8fXv.png" },
+    { id: "ESPN", name: "ESPN", logo: "https://i.imgur.com/V9v8fXw.png" },
+    { id: "ESPN2", name: "ESPN 2", logo: "https://i.imgur.com/U9v8fXx.png" },
+    { id: "ESPN4", name: "ESPN 4", logo: "https://i.imgur.com/T9v8fXy.png" },
+    
+    // NOTÍCIAS
+    { id: "GloboNews", name: "GloboNews", logo: "https://i.imgur.com/S9v8fXz.png" },
+    { id: "CNN", name: "CNN Brasil", logo: "https://i.imgur.com/R9v8fX1.png" },
+    { id: "JovemPanNews", name: "Jovem Pan News", logo: "https://i.imgur.com/Q9v8fX2.png" },
+    { id: "BandNews", name: "BandNews TV", logo: "https://i.imgur.com/P9v8fX3.png" }
+];
+   builder.defineCatalogHandler(async (args) => {
+    console.log("Solicitação de catálogo recebida:", args.id);
+
     if (args.id === "guia_br") {
         const agora = new Date();
 
-    const canaisParaMostrar = []
-
-  const listaCanais = [
-      // --- TV ABERTA ---
-      { xmlId: "Globo", name: "Globo", logo: "https://i.imgur.com/7S879vS.png" },
-      { xmlId: "SBT", name: "SBT", logo: "https://i.imgur.com/vHqQ9z4.png" },
-      { xmlId: "Record", name: "Record TV", logo: "https://i.imgur.com/uG939z4.png" },
-      { xmlId: "Band", name: "Band", logo: "https://i.imgur.com/O6S322P.png" },
-
-      // --- FILMES E SÉRIES ---
-      { xmlId: "HBO", name: "HBO", logo: "https://i.imgur.com/mS9X3zG.png" },
-      { xmlId: "HBO2", name: "HBO 2", logo: "https://i.imgur.com/mS9X3zG.png" },
-      { xmlId: "TelecinePremium", name: "Telecine Premium", logo: "https://i.imgur.com/Z4v0S0X.png" },
-      { xmlId: "TelecineAction", name: "Telecine Action", logo: "https://i.imgur.com/Z4v0S0X.png" },
-      { xmlId: "TelecinePipoca", name: "Telecine Pipoca", logo: "https://i.imgur.com/Z4v0S0X.png" },
-      { xmlId: "Megapix", name: "Megapix", logo: "https://i.imgur.com/6Xw6X7X.png" },
-      { xmlId: "TNT", name: "TNT", logo: "https://i.imgur.com/R3U6zY9.png" },
-      { xmlId: "Cinemax", name: "Cinemax", logo: "https://i.imgur.com/T0W1W2Y.png" },
-      { xmlId: "Warner", name: "Warner Channel", logo: "https://i.imgur.com/2s3D8W9.png" },
-      { xmlId: "StudioUniversal", name: "Studio Universal", logo: "https://i.imgur.com/w9U6Y9X.png" },
-      { xmlId: "AXN", name: "AXN", logo: "https://i.imgur.com/8N69vT1.png" },
-      { xmlId: "UniversalTV", name: "Universal TV", logo: "https://i.imgur.com/5GzLpT7.png" },
-
-      // --- VARIEDADES E DOCUMENTÁRIOS ---
-      { xmlId: "Multishow", name: "Multishow", logo: "https://i.imgur.com/G9O6zW3.png" },
-      { xmlId: "GNT", name: "GNT", logo: "https://i.imgur.com/H9O6zW3.png" },
-      { xmlId: "DiscoveryChannel", name: "Discovery Channel", logo: "https://i.imgur.com/5GzLpT7.png" },
-      { xmlId: "DiscoveryHomeHealth", name: "Discovery H&H", logo: "https://i.imgur.com/5GzLpT7.png" },
-      { xmlId: "HistoryChannel", name: "History Channel", logo: "https://i.imgur.com/uG939z4.png" },
-      { xmlId: "NationalGeographic", name: "Nat Geo", logo: "https://i.imgur.com/O6S322P.png" },
-
-      // --- ESPORTES ---
-      { xmlId: "SporTV", name: "SporTV", logo: "https://i.imgur.com/mOnd1H9.png" },
-      { xmlId: "SporTV2", name: "SporTV 2", logo: "https://i.imgur.com/mOnd1H9.png" },
-      { xmlId: "SporTV3", name: "SporTV 3", logo: "https://i.imgur.com/mOnd1H9.png" },
-      { xmlId: "ESPN", name: "ESPN", logo: "https://i.imgur.com/yO8vW9R.png" },
-      { xmlId: "ESPN2", name: "ESPN 2", logo: "https://i.imgur.com/yO8vW9R.png" },
-      { xmlId: "ESPN4", name: "ESPN 4", logo: "https://i.imgur.com/yO8vW9R.png" },
-      { xmlId: "Premiere", name: "Premiere", logo: "https://i.imgur.com/mOnd1H9.png" },
-      { xmlId: "Premiere2", name: "Premiere 2", logo: "https://i.imgur.com/mOnd1H9.png" }
-  ];
-
-    const metas = canais.map(canal => {
-            let programaAtual = "Clique para ver a programação";
+        const metas = CANAIS_FIXOS.map(canal => {
+            let programaAtual = "Carregando programação...";
             
-            // Tenta encontrar o programa no EPG
-            if (epgCache.length > 0) {
+            if (epgCache && epgCache.length > 0) {
+                // Tenta achar o que está passando agora
                 const prog = epgCache.find(p => {
                     if (p.$.channel !== canal.id) return false;
                     const start = new Date(p.$.start.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
                     const stop = new Date(p.$.stop.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3T$4:$5:00'));
                     return agora >= start && agora <= stop;
                 });
-                if (prog) programaAtual = prog.title[0];
+                if (prog && prog.title) programaAtual = prog.title[0]._;
             }
 
             return {
-                id: `br_${canal.id.toLowerCase()}`,
+                id: `brtv_${canal.id.toLowerCase()}`,
                 type: "tv",
                 name: canal.name,
                 poster: canal.logo,
                 posterShape: "square",
-                description: `Agora: ${programaAtual}`
+                description: `📺 AGORA: ${programaAtual}`,
+                background: canal.logo
             };
         });
 
         return { metas };
     }
+
     return { metas: [] };
 });
 
-// 4. Handler de Metadados (Quando clica no canal)
 builder.defineMetaHandler(async (args) => {
-    // Retorna os detalhes do canal se necessário
+    // Para evitar erros de "Empty" ao clicar, retornamos dados básicos
+    const canalId = args.id.replace("brtv_", "");
+    const canal = CANAIS_FIXOS.find(c => c.id.toLowerCase() === canalId);
+    
+    if (canal) {
+        return {
+            meta: {
+                id: args.id,
+                type: "tv",
+                name: canal.name,
+                poster: canal.logo,
+                posterShape: "square",
+                description: `Guia de programação para ${canal.name}`
+            }
+        };
+    }
     return { meta: null };
 });
 
-// 5. Exportação para Vercel/Render
 const addonInterface = builder.getInterface();
+
+// Compatibilidade Vercel/Render/Local
 module.exports = (req, res) => {
-    addonInterface.serveHTTP(req, res);
+    if (req.url === '/') {
+        res.writeHead(302, { 'Location': '/manifest.json' });
+        res.end();
+    } else {
+        addonInterface.serveHTTP(req, res);
+    }
 };
 
-// Rodar localmente (node index.js)
 if (require.main === module) {
     serveHTTP(addonInterface, { port: process.env.PORT || 7000 });
 }
