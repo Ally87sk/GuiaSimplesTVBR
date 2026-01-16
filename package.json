@@ -1,21 +1,11 @@
 {
-  "name": "guia-tv-brasil-stremio",
-  "version": "1.0.0",
-  "description": "Addon de guia de programação para canais brasileiros",
+  "name": "guia-tv-brasil-full",
+  "version": "1.4.0",
+  "description": "Addon de Guia de Programação EPG para Stremio",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "keywords": [
-    "stremio",
-    "addon",
-    "brazil",
-    "tv",
-    "epg"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "stremio-addon-sdk": "^1.6.10",
     "axios": "^1.6.0",
@@ -23,5 +13,7 @@
   },
   "engines": {
     "node": ">=18.x"
-  }
+  },
+  "author": "Ally87sk",
+  "license": "ISC"
 }
