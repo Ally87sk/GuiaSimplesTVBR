@@ -3,84 +3,118 @@ const axios = require("axios");
 const xml2js = require("xml2js");
 
 const EPG_URL = "https://epgpainel.ddns.net/epg.xml";
+const LOGO_BASE = "https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil";
+
 let epgCache = [];
 
 async function updateEPG() {
     try {
-        console.log("Baixando Grade Completa...");
-        const response = await axios.get(EPG_URL, { timeout: 30000 });
+        const response = await axios.get(EPG_URL, { timeout: 45000 });
         const parser = new xml2js.Parser();
         const result = await parser.parseStringPromise(response.data);
         if (result && result.tv && result.tv.programme) {
             epgCache = result.tv.programme;
-            console.log(`✅ Sucesso! ${epgCache.length} programas na memória.`);
+            console.log(`✅ Guia Sincronizado: ${epgCache.length} programas carregados.`);
         }
     } catch (err) {
         console.error("❌ Erro ao baixar EPG:", err.message);
     }
 }
-
 updateEPG();
 setInterval(updateEPG, 2 * 60 * 60 * 1000);
 
 const builder = new addonBuilder({
-    id: "org.guia.br.full",
-    name: "Guia TV Brasil FULL",
-    version: "1.4.0",
-    description: "Grade completa de canais abertos e fechados.",
+    id: "org.guia.br.ultra",
+    name: "Guia TV Brasil Ultra",
+    version: "1.8.0",
+    description: "Grade completa com +70 canais. Logos oficiais HD.",
     resources: ["catalog", "meta"],
     types: ["tv"],
     catalogs: [{ type: "tv", id: "guia_br", name: "Grade de Programação" }]
 });
 
-// LISTA COMPLETA DE CANAIS (IDs compatíveis com o XML DDNS)
 const CANAIS_FIXOS = [
     // ABERTOS
-    { id: "GLOBO", name: "Globo", logo: "https://i.imgur.com/7S879vS.png" },
-    { id: "SBT", name: "SBT", logo: "https://i.imgur.com/vHqQ9z4.png" },
-    { id: "RECORD", name: "Record TV", logo: "https://i.imgur.com/uG939z4.png" },
-    { id: "BAND", name: "Band", logo: "https://i.imgur.com/O6S322P.png" },
-    { id: "REDETV", name: "Rede TV!", logo: "https://i.imgur.com/S6pC0zI.png" },
-    { id: "CULTURA", name: "TV Cultura", logo: "https://i.imgur.com/p00P3p8.png" },
+    { id: "GLOBO", name: "Globo", logo: `${LOGO_BASE}/globo.png` },
+    { id: "SBT", name: "SBT", logo: `${LOGO_BASE}/sbt.png` },
+    { id: "RECORD", name: "Record TV", logo: `${LOGO_BASE}/record-tv.png` },
+    { id: "BAND", name: "Band", logo: `${LOGO_BASE}/band.png` },
+    { id: "REDETV", name: "Rede TV!", logo: `${LOGO_BASE}/redetv.png` },
+    { id: "CULTURA", name: "TV Cultura", logo: `${LOGO_BASE}/tv-cultura.png` },
+    { id: "GAZETA", name: "TV Gazeta", logo: `${LOGO_BASE}/tv-gazeta.png` },
+    { id: "REDE VIDA", name: "Rede Vida", logo: `${LOGO_BASE}/redevida.png` },
+    { id: "RECORD NEWS", name: "Record News", logo: `${LOGO_BASE}/record-news.png` },
 
-    // TELECINE
-    { id: "TELECINE PREMIUM", name: "Telecine Premium", logo: "https://i.imgur.com/8N7S1f4.png" },
-    { id: "TELECINE ACTION", name: "Telecine Action", logo: "https://i.imgur.com/2YyO6Wn.png" },
-    { id: "TELECINE TOUCH", name: "Telecine Touch", logo: "https://i.imgur.com/vH7S1f4.png" },
-    { id: "TELECINE PIPOCA", name: "Telecine Pipoca", logo: "https://i.imgur.com/8N7S1f4.png" },
-    { id: "TELECINE FUN", name: "Telecine Fun", logo: "https://i.imgur.com/vH7S1f4.png" },
-    { id: "TELECINE CULT", name: "Telecine Cult", logo: "https://i.imgur.com/2YyO6Wn.png" },
-
-    // HBO
-    { id: "HBO", name: "HBO", logo: "https://i.imgur.com/H6D4F9T.png" },
-    { id: "HBO 2", name: "HBO 2", logo: "https://i.imgur.com/Y3UuA6O.png" },
-    { id: "HBO FAMILY", name: "HBO Family", logo: "https://i.imgur.com/8f8Z0eB.png" },
-    { id: "HBO SIGNATURE", name: "HBO Signature", logo: "https://i.imgur.com/w9Z8bW9.png" },
+    // FILMES E SÉRIES
+    { id: "HBO", name: "HBO", logo: `${LOGO_BASE}/hbo.png` },
+    { id: "HBO 2", name: "HBO 2", logo: `${LOGO_BASE}/hbo-2.png` },
+    { id: "HBO FAMILY", name: "HBO Family", logo: `${LOGO_BASE}/hbo-family.png` },
+    { id: "HBO SIGNATURE", name: "HBO Signature", logo: `${LOGO_BASE}/hbo-signature.png` },
+    { id: "HBO MUNDI", name: "HBO Mundi", logo: `${LOGO_BASE}/hbo-mundi.png` },
+    { id: "HBO POP", name: "HBO Pop", logo: `${LOGO_BASE}/hbo-pop.png` },
+    { id: "HBO XTREME", name: "HBO Xtreme", logo: `${LOGO_BASE}/hbo-xtreme.png` },
+    { id: "TELECINE PREMIUM", name: "Telecine Premium", logo: `${LOGO_BASE}/telecine-premium.png` },
+    { id: "TELECINE ACTION", name: "Telecine Action", logo: `${LOGO_BASE}/telecine-action.png` },
+    { id: "TELECINE TOUCH", name: "Telecine Touch", logo: `${LOGO_BASE}/telecine-touch.png` },
+    { id: "TELECINE PIPOCA", name: "Telecine Pipoca", logo: `${LOGO_BASE}/telecine-pipoca.png` },
+    { id: "TELECINE FUN", name: "Telecine Fun", logo: `${LOGO_BASE}/telecine-fun.png` },
+    { id: "TELECINE CULT", name: "Telecine Cult", logo: `${LOGO_BASE}/telecine-cult.png` },
+    { id: "WARNER", name: "Warner TV", logo: `${LOGO_BASE}/warner-channel.png` },
+    { id: "TNT", name: "TNT", logo: `${LOGO_BASE}/tnt.png` },
+    { id: "TNT SERIES", name: "TNT Series", logo: `${LOGO_BASE}/tnt-series.png` },
+    { id: "SPACE", name: "Space", logo: `${LOGO_BASE}/space.png` },
+    { id: "AXN", name: "AXN", logo: `${LOGO_BASE}/axn.png` },
+    { id: "UNIVERSAL", name: "Universal TV", logo: `${LOGO_BASE}/universal-tv.png` },
+    { id: "USA", name: "USA Network", logo: `${LOGO_BASE}/usa-network.png` },
+    { id: "MEGAPIX", name: "Megapix", logo: `${LOGO_BASE}/megapix.png` },
+    { id: "PARAMOUNT", name: "Paramount Network", logo: `${LOGO_BASE}/paramount-network.png` },
+    { id: "STUDIO UNIVERSAL", name: "Studio Universal", logo: `${LOGO_BASE}/studio-universal.png` },
+    { id: "CANAL BRASIL", name: "Canal Brasil", logo: `${LOGO_BASE}/canal-brasil.png` },
+    { id: "A&E", name: "A&E", logo: `${LOGO_BASE}/ae.png` },
+    { id: "SONY", name: "Sony Channel", logo: `${LOGO_BASE}/sony-channel.png` },
 
     // ESPORTES
-    { id: "SPORTV", name: "SporTV", logo: "https://i.imgur.com/Y9v8fXt.png" },
-    { id: "SPORTV 2", name: "SporTV 2", logo: "https://i.imgur.com/X9v8fXu.png" },
-    { id: "SPORTV 3", name: "SporTV 3", logo: "https://i.imgur.com/W9v8fXv.png" },
-    { id: "ESPN", name: "ESPN", logo: "https://i.imgur.com/V9v8fXw.png" },
-    { id: "ESPN 2", name: "ESPN 2", logo: "https://i.imgur.com/U9v8fXx.png" },
-    { id: "ESPN 4", name: "ESPN 4", logo: "https://i.imgur.com/T9v8fXy.png" },
-    { id: "PREMIERE", name: "Premiere", logo: "https://i.imgur.com/h5T2vWn.png" },
-
-    // VARIEDADES E FILMES
-    { id: "WARNER", name: "Warner TV", logo: "https://i.imgur.com/yF9x8Vn.png" },
-    { id: "TNT", name: "TNT", logo: "https://i.imgur.com/z8tFw8F.png" },
-    { id: "UNIVERSAL", name: "Universal TV", logo: "https://i.imgur.com/H8iN2y0.png" },
-    { id: "AXN", name: "AXN", logo: "https://i.imgur.com/w09BvYn.png" },
-    { id: "MEGAPIX", name: "Megapix", logo: "https://i.imgur.com/H7yW8Zf.png" },
-    { id: "VIVA", name: "Viva", logo: "https://i.imgur.com/G9v8fXs.png" },
-    { id: "MULTISHOW", name: "Multishow", logo: "https://i.imgur.com/H9v8fXr.png" },
-    { id: "GNT", name: "GNT", logo: "https://i.imgur.com/I9v8fXq.png" },
+    { id: "SPORTV", name: "SporTV", logo: `${LOGO_BASE}/sportv.png` },
+    { id: "SPORTV 2", name: "SporTV 2", logo: `${LOGO_BASE}/sportv-2.png` },
+    { id: "SPORTV 3", name: "SporTV 3", logo: `${LOGO_BASE}/sportv-3.png` },
+    { id: "ESPN", name: "ESPN", logo: `${LOGO_BASE}/espn.png` },
+    { id: "ESPN 2", name: "ESPN 2", logo: `${LOGO_BASE}/espn-2.png` },
+    { id: "ESPN 3", name: "ESPN 3", logo: `${LOGO_BASE}/espn-3.png` },
+    { id: "ESPN 4", name: "ESPN 4", logo: `${LOGO_BASE}/espn-4.png` },
+    { id: "BANDSPORTS", name: "BandSports", logo: `${LOGO_BASE}/bandsports.png` },
+    { id: "PREMIERE CLUBES", name: "Premiere", logo: `${LOGO_BASE}/premiere.png` },
+    { id: "PREMIERE 2", name: "Premiere 2", logo: `${LOGO_BASE}/premiere.png` },
+    { id: "PREMIERE 3", name: "Premiere 3", logo: `${LOGO_BASE}/premiere.png` },
+    { id: "COMBATE", name: "Combate", logo: `${LOGO_BASE}/combate.png` },
 
     // INFANTIL
-    { id: "DISCOVERY KIDS", name: "Discovery Kids", logo: "https://i.imgur.com/G9b8fXn.png" },
-    { id: "CARTOON NETWORK", name: "Cartoon Network", logo: "https://i.imgur.com/I7V8vYn.png" },
-    { id: "GLOOB", name: "Gloob", logo: "https://i.imgur.com/U7v8YZn.png" },
-    { id: "NICKELODEON", name: "Nickelodeon", logo: "https://i.imgur.com/Z9v8fXn.png" }
+    { id: "DISCOVERY KIDS", name: "Discovery Kids", logo: `${LOGO_BASE}/discovery-kids.png` },
+    { id: "CARTOON NETWORK", name: "Cartoon Network", logo: `${LOGO_BASE}/cartoon-network.png` },
+    { id: "CARTOONITO", name: "Cartoonito", logo: `${LOGO_BASE}/cartoonito.png` },
+    { id: "GLOOB", name: "Gloob", logo: `${LOGO_BASE}/gloob.png` },
+    { id: "GLOOBINHO", name: "Gloobinho", logo: `${LOGO_BASE}/gloobinho.png` },
+    { id: "NICKELODEON", name: "Nickelodeon", logo: `${LOGO_BASE}/nickelodeon.png` },
+    { id: "NICK JR", name: "Nick Jr", logo: `${LOGO_BASE}/nick-jr.png` },
+    { id: "DISNEY CHANNEL", name: "Disney Channel", logo: `${LOGO_BASE}/disney-channel.png` },
+
+    // VARIADOS E DOCUMENTÁRIOS
+    { id: "VIVA", name: "Viva", logo: `${LOGO_BASE}/viva.png` },
+    { id: "MULTISHOW", name: "Multishow", logo: `${LOGO_BASE}/multishow.png` },
+    { id: "GNT", name: "GNT", logo: `${LOGO_BASE}/gnt.png` },
+    { id: "DISCOVERY", name: "Discovery Channel", logo: `${LOGO_BASE}/discovery-channel.png` },
+    { id: "DISCOVERY HOME & HEALTH", name: "Discovery H&H", logo: `${LOGO_BASE}/discovery-home-and-health.png` },
+    { id: "HISTORY", name: "History Channel", logo: `${LOGO_BASE}/history.png` },
+    { id: "HISTORY 2", name: "History 2", logo: `${LOGO_BASE}/history-2.png` },
+    { id: "NATIONAL GEOGRAPHIC", name: "Nat Geo", logo: `${LOGO_BASE}/national-geographic.png` },
+    { id: "ANIMAL PLANET", name: "Animal Planet", logo: `${LOGO_BASE}/animal-planet.png` },
+    { id: "ID", name: "Investigation Discovery", logo: `${LOGO_BASE}/investigation-discovery.png` },
+    { id: "E! ENTERTAINMENT", name: "E! Entertainment", logo: `${LOGO_BASE}/e-entertainment.png` },
+
+    // NOTÍCIAS
+    { id: "GLOBO NEWS", name: "GloboNews", logo: `${LOGO_BASE}/globonews.png` },
+    { id: "CNN BRASIL", name: "CNN Brasil", logo: `${LOGO_BASE}/cnn-brasil.png` },
+    { id: "JOVEM PAN NEWS", name: "Jovem Pan News", logo: `${LOGO_BASE}/jovem-pan-news.png` },
+    { id: "BAND NEWS", name: "BandNews TV", logo: `${LOGO_BASE}/bandnews.png` }
 ];
 
 function getPrograma(canalId) {
@@ -89,13 +123,10 @@ function getPrograma(canalId) {
     
     const prog = epgCache.find(p => {
         if (p.$.channel.toUpperCase() !== canalId.toUpperCase()) return false;
-        
-        // Formato: 20240520143000
         const s = p.$.start;
-        const start = new Date(`${s.substring(0,4)}-${s.substring(4,6)}-${s.substring(6,8)}T${s.substring(8,10)}:${s.substring(10,12)}:${s.substring(12,14)}`);
+        const start = new Date(s.substring(0,4), s.substring(4,6)-1, s.substring(6,8), s.substring(8,10), s.substring(10,12));
         const e = p.$.stop;
-        const stop = new Date(`${e.substring(0,4)}-${e.substring(4,6)}-${e.substring(6,8)}T${e.substring(8,10)}:${e.substring(10,12)}:${e.substring(12,14)}`);
-        
+        const stop = new Date(e.substring(0,4), e.substring(4,6)-1, e.substring(6,8), e.substring(8,10), e.substring(10,12));
         return agora >= start && agora <= stop;
     });
 
@@ -117,7 +148,7 @@ builder.defineCatalogHandler(async () => {
             name: canal.name,
             poster: canal.logo,
             posterShape: "square",
-            description: info ? `🔴 AGORA: ${info.titulo}` : "Aguardando EPG..."
+            description: info ? `🔴 AGORA: ${info.titulo}` : "Programação indisponível."
         };
     });
     return { metas };
@@ -126,7 +157,6 @@ builder.defineCatalogHandler(async () => {
 builder.defineMetaHandler(async (args) => {
     const cleanId = args.id.replace("tvbr_", "").replace(/_/g, " ").toUpperCase();
     const canal = CANAIS_FIXOS.find(c => c.id.toUpperCase() === cleanId);
-    
     if (canal) {
         const info = getPrograma(canal.id);
         return {
@@ -138,7 +168,7 @@ builder.defineMetaHandler(async (args) => {
                 logo: canal.logo,
                 background: canal.logo,
                 posterShape: "square",
-                description: info ? `PASSANDO AGORA:\n${info.titulo}\n\nSOBRE:\n${info.desc}` : "Programação indisponível."
+                description: info ? `PASSANDO AGORA:\n${info.titulo}\n\nSOBRE:\n${info.desc}` : "Informações de guia não encontradas."
             }
         };
     }
@@ -148,8 +178,8 @@ builder.defineMetaHandler(async (args) => {
 const addonInterface = builder.getInterface();
 module.exports = (req, res) => {
     if (req.url === '/' || req.url === '/manifest.json') {
-        res.setHeader('Content-Type', 'application/json');
-        res.send(addonInterface.manifest);
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        res.end(JSON.stringify(addonInterface.manifest));
     } else {
         addonInterface.serveHTTP(req, res);
     }
