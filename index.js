@@ -3,7 +3,8 @@ const axios = require("axios");
 const xml2js = require("xml2js");
 
 const EPG_URL = "https://epgpainel.ddns.net/epg.xml";
-const LOGO_BASE = "https://raw.githubusercontent.com/tv-logo/tv-logos/main/countries/brazil";
+// Novo repositório conforme solicitado
+const LOGO_BASE = "https://raw.githubusercontent.com/szneto/BrazilTVLogos/main/logos";
 
 let epgCache = [];
 
@@ -24,10 +25,10 @@ updateEPG();
 setInterval(updateEPG, 60 * 60 * 1000);
 
 const builder = new addonBuilder({
-    id: "org.guia.br.categorias.v14",
-    name: "Guia TV Brasil Premium",
-    version: "1.14.0",
-    description: "Grade completa dividida por categorias. Logos oficiais.",
+    id: "org.guia.br.szneto.v15",
+    name: "Guia TV Brasil SZ",
+    version: "1.15.0",
+    description: "Grade completa com logos do repositório szneto.",
     resources: ["catalog", "meta"],
     types: ["tv"],
     catalogs: [{ 
@@ -40,72 +41,60 @@ const builder = new addonBuilder({
 });
 
 const CANAIS_FIXOS = [
-    // CANAIS ABERTOS
-    { id: "GLOBO", name: "Globo", logo: "globo.png", genre: "Canais Abertos" },
-    { id: "SBT", name: "SBT", logo: "sbt.png", genre: "Canais Abertos" },
-    { id: "RECORD", name: "Record TV", logo: "record-tv.png", genre: "Canais Abertos" },
-    { id: "BAND", name: "Band", logo: "band.png", genre: "Canais Abertos" },
-    { id: "REDETV", name: "Rede TV!", logo: "redetv.png", genre: "Canais Abertos" },
-    { id: "CULTURA", name: "TV Cultura", logo: "tv-cultura.png", genre: "Canais Abertos" },
-    { id: "GAZETA", name: "TV Gazeta", logo: "tv-gazeta.png", genre: "Canais Abertos" },
-    { id: "REDE VIDA", name: "Rede Vida", logo: "redevida.png", genre: "Canais Abertos" },
+    // CANAIS ABERTOS (Nomes de arquivos do szneto usam MAIÚSCULAS)
+    { id: "GLOBO", name: "Globo", logo: "GLOBO.png", genre: "Canais Abertos" },
+    { id: "SBT", name: "SBT", logo: "SBT.png", genre: "Canais Abertos" },
+    { id: "RECORD", name: "Record TV", logo: "RECORD_TV.png", genre: "Canais Abertos" },
+    { id: "BAND", name: "Band", logo: "BAND.png", genre: "Canais Abertos" },
+    { id: "REDETV", name: "Rede TV!", logo: "REDETV.png", genre: "Canais Abertos" },
+    { id: "CULTURA", name: "TV Cultura", logo: "CULTURA.png", genre: "Canais Abertos" },
+    { id: "GAZETA", name: "TV Gazeta", logo: "GAZETA.png", genre: "Canais Abertos" },
 
     // FILMES E SÉRIES
-    { id: "HBO", name: "HBO", logo: "hbo.png", genre: "Filmes e Séries" },
-    { id: "HBO 2", name: "HBO 2", logo: "hbo-2.png", genre: "Filmes e Séries" },
-    { id: "HBO FAMILY", name: "HBO Family", logo: "hbo-family.png", genre: "Filmes e Séries" },
-    { id: "HBO SIGNATURE", name: "HBO Signature", logo: "hbo-signature.png", genre: "Filmes e Séries" },
-    { id: "TELECINE PREMIUM", name: "Telecine Premium", logo: "telecine-premium.png", genre: "Filmes e Séries" },
-    { id: "TELECINE ACTION", name: "Telecine Action", logo: "telecine-action.png", genre: "Filmes e Séries" },
-    { id: "TELECINE TOUCH", name: "Telecine Touch", logo: "telecine-touch.png", genre: "Filmes e Séries" },
-    { id: "TELECINE PIPOCA", name: "Telecine Pipoca", logo: "telecine-pipoca.png", genre: "Filmes e Séries" },
-    { id: "TELECINE FUN", name: "Telecine Fun", logo: "telecine-fun.png", genre: "Filmes e Séries" },
-    { id: "TELECINE CULT", name: "Telecine Cult", logo: "telecine-cult.png", genre: "Filmes e Séries" },
-    { id: "WARNER", name: "Warner TV", logo: "warner-channel.png", genre: "Filmes e Séries" },
-    { id: "TNT", name: "TNT", logo: "tnt.png", genre: "Filmes e Séries" },
-    { id: "TNT SERIES", name: "TNT Series", logo: "tnt-series.png", genre: "Filmes e Séries" },
-    { id: "SPACE", name: "Space", logo: "space.png", genre: "Filmes e Séries" },
-    { id: "AXN", name: "AXN", logo: "axn.png", genre: "Filmes e Séries" },
-    { id: "UNIVERSAL", name: "Universal TV", logo: "universal-tv.png", genre: "Filmes e Séries" },
-    { id: "MEGAPIX", name: "Megapix", logo: "megapix.png", genre: "Filmes e Séries" },
-    { id: "PARAMOUNT", name: "Paramount Network", logo: "paramount-network.png", genre: "Filmes e Séries" },
-    { id: "STUDIO UNIVERSAL", name: "Studio Universal", logo: "studio-universal.png", genre: "Filmes e Séries" },
-    { id: "SONY", name: "Sony Channel", logo: "sony-channel.png", genre: "Filmes e Séries" },
+    { id: "HBO", name: "HBO", logo: "HBO_HD.png", genre: "Filmes e Séries" },
+    { id: "HBO 2", name: "HBO 2", logo: "HBO2_HD.png", genre: "Filmes e Séries" },
+    { id: "HBO FAMILY", name: "HBO Family", logo: "HBO_FAMILY_HD.png", genre: "Filmes e Séries" },
+    { id: "HBO SIGNATURE", name: "HBO Signature", logo: "HBO_SIGNATURE_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE PREMIUM", name: "Telecine Premium", logo: "TC_PREMIUM_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE ACTION", name: "Telecine Action", logo: "TC_ACTION_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE TOUCH", name: "Telecine Touch", logo: "TC_TOUCH_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE PIPOCA", name: "Telecine Pipoca", logo: "TC_PIPOCA_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE FUN", name: "Telecine Fun", logo: "TC_FUN_HD.png", genre: "Filmes e Séries" },
+    { id: "TELECINE CULT", name: "Telecine Cult", logo: "TC_CULT_HD.png", genre: "Filmes e Séries" },
+    { id: "WARNER", name: "Warner TV", logo: "WARNER_CHANNEL_HD.png", genre: "Filmes e Séries" },
+    { id: "TNT", name: "TNT", logo: "TNT_HD.png", genre: "Filmes e Séries" },
+    { id: "TNT SERIES", name: "TNT Series", logo: "TNT_SERIES_HD.png", genre: "Filmes e Séries" },
+    { id: "SPACE", name: "Space", logo: "SPACE_HD.png", genre: "Filmes e Séries" },
+    { id: "AXN", name: "AXN", logo: "AXN_HD.png", genre: "Filmes e Séries" },
+    { id: "UNIVERSAL", name: "Universal TV", logo: "UNIVERSAL_TV_HD.png", genre: "Filmes e Séries" },
+    { id: "MEGAPIX", name: "Megapix", logo: "MEGAPIX_HD.png", genre: "Filmes e Séries" },
+    { id: "SONY", name: "Sony Channel", logo: "SONY_CHANNEL_HD.png", genre: "Filmes e Séries" },
 
     // ESPORTES
-    { id: "SPORTV", name: "SporTV", logo: "sportv.png", genre: "Esportes" },
-    { id: "SPORTV 2", name: "SporTV 2", logo: "sportv-2.png", genre: "Esportes" },
-    { id: "SPORTV 3", name: "SporTV 3", logo: "sportv-3.png", genre: "Esportes" },
-    { id: "ESPN", name: "ESPN", logo: "espn.png", genre: "Esportes" },
-    { id: "ESPN 2", name: "ESPN 2", logo: "espn-2.png", genre: "Esportes" },
-    { id: "ESPN 3", name: "ESPN 3", logo: "espn-3.png", genre: "Esportes" },
-    { id: "ESPN 4", name: "ESPN 4", logo: "espn-4.png", genre: "Esportes" },
-    { id: "BANDSPORTS", name: "BandSports", logo: "bandsports.png", genre: "Esportes" },
-    { id: "PREMIERE CLUBES", name: "Premiere", logo: "premiere.png", genre: "Esportes" },
-    { id: "COMBATE", name: "Combate", logo: "combate.png", genre: "Esportes" },
+    { id: "SPORTV", name: "SporTV", logo: "SPORTV_HD.png", genre: "Esportes" },
+    { id: "SPORTV 2", name: "SporTV 2", logo: "SPORTV2_HD.png", genre: "Esportes" },
+    { id: "SPORTV 3", name: "SporTV 3", logo: "SPORTV3_HD.png", genre: "Esportes" },
+    { id: "ESPN", name: "ESPN", logo: "ESPN_HD.png", genre: "Esportes" },
+    { id: "ESPN 2", name: "ESPN 2", logo: "ESPN2_HD.png", genre: "Esportes" },
+    { id: "ESPN 3", name: "ESPN 3", logo: "ESPN3_HD.png", genre: "Esportes" },
+    { id: "ESPN 4", name: "ESPN 4", logo: "ESPN4_HD.png", genre: "Esportes" },
+    { id: "PREMIERE CLUBES", name: "Premiere", logo: "PREMIERE_HD.png", genre: "Esportes" },
+    { id: "COMBATE", name: "Combate", logo: "COMBATE_HD.png", genre: "Esportes" },
 
     // INFANTIL
-    { id: "DISCOVERY KIDS", name: "Discovery Kids", logo: "discovery-kids.png", genre: "Infantil" },
-    { id: "CARTOON NETWORK", name: "Cartoon Network", logo: "cartoon-network.png", genre: "Infantil" },
-    { id: "GLOOB", name: "Gloob", logo: "gloob.png", genre: "Infantil" },
-    { id: "GLOOBINHO", name: "Gloobinho", logo: "gloobinho.png", genre: "Infantil" },
-    { id: "NICKELODEON", name: "Nickelodeon", logo: "nickelodeon.png", genre: "Infantil" },
-    { id: "NICK JR", name: "Nick Jr", logo: "nick-jr.png", genre: "Infantil" },
-    { id: "DISNEY CHANNEL", name: "Disney Channel", logo: "disney-channel.png", genre: "Infantil" },
+    { id: "DISCOVERY KIDS", name: "Discovery Kids", logo: "DISCOVERY_KIDS_HD.png", genre: "Infantil" },
+    { id: "CARTOON NETWORK", name: "Cartoon Network", logo: "CARTOON_NETWORK_HD.png", genre: "Infantil" },
+    { id: "GLOOB", name: "Gloob", logo: "GLOOB_HD.png", genre: "Infantil" },
+    { id: "NICKELODEON", name: "Nickelodeon", logo: "NICKELODEON_HD.png", genre: "Infantil" },
+    { id: "DISNEY CHANNEL", name: "Disney Channel", logo: "DISNEY_CHANNEL_HD.png", genre: "Infantil" },
 
-    // DOCUMENTÁRIOS E VARIEDADES
-    { id: "DISCOVERY", name: "Discovery Channel", logo: "discovery-channel.png", genre: "Documentários" },
-    { id: "HISTORY", name: "History Channel", logo: "history.png", genre: "Documentários" },
-    { id: "NATIONAL GEOGRAPHIC", name: "Nat Geo", logo: "national-geographic.png", genre: "Documentários" },
-    { id: "VIVA", name: "Viva", logo: "viva.png", genre: "Documentários" },
-    { id: "MULTISHOW", name: "Multishow", logo: "multishow.png", genre: "Documentários" },
-    { id: "GNT", name: "GNT", logo: "gnt.png", genre: "Documentários" },
-
-    // NOTÍCIAS
-    { id: "GLOBO NEWS", name: "GloboNews", logo: "globonews.png", genre: "Notícias" },
-    { id: "CNN BRASIL", name: "CNN Brasil", logo: "cnn-brasil.png", genre: "Notícias" },
-    { id: "JOVEM PAN NEWS", name: "Jovem Pan News", logo: "jovem-pan-news.png", genre: "Notícias" },
-    { id: "BAND NEWS", name: "BandNews TV", logo: "bandnews.png", genre: "Notícias" }
+    // NOTÍCIAS E DOCS
+    { id: "GLOBO NEWS", name: "GloboNews", logo: "GLOBONEWS_HD.png", genre: "Notícias" },
+    { id: "CNN BRASIL", name: "CNN Brasil", logo: "CNN_BRASIL_HD.png", genre: "Notícias" },
+    { id: "JOVEM PAN NEWS", name: "Jovem Pan News", logo: "JOVEM_PAN_NEWS_HD.png", genre: "Notícias" },
+    { id: "DISCOVERY", name: "Discovery Channel", logo: "DISCOVERY_CHANNEL_HD.png", genre: "Documentários" },
+    { id: "HISTORY", name: "History Channel", logo: "HISTORY_HD.png", genre: "Documentários" },
+    { id: "MULTISHOW", name: "Multishow", logo: "MULTISHOW_HD.png", genre: "Documentários" }
 ];
 
 function getPrograma(canalId) {
@@ -135,7 +124,7 @@ builder.defineCatalogHandler(async (args) => {
         const info = getPrograma(canal.id);
         const logoUrl = `${LOGO_BASE}/${canal.logo}`;
         return {
-            id: `v14_${canal.id.replace(/ /g, "_")}`,
+            id: `v15_${canal.id.replace(/ /g, "_")}`,
             type: "tv",
             name: canal.name,
             poster: logoUrl,
@@ -147,7 +136,7 @@ builder.defineCatalogHandler(async (args) => {
 });
 
 builder.defineMetaHandler(async (args) => {
-    const originalId = args.id.replace("v14_", "").replace(/_/g, " ");
+    const originalId = args.id.replace("v15_", "").replace(/_/g, " ");
     const canal = CANAIS_FIXOS.find(c => c.id.toUpperCase() === originalId.toUpperCase());
     if (canal) {
         const info = getPrograma(canal.id);
